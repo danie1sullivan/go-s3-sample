@@ -86,7 +86,7 @@ func handleS3Delete(b *string) http.HandlerFunc {
 			return
 		}
 
-		fmt.Println("Deleted " + *objectName + " from " + *bucket)
+		fmt.Println("Deleted " + *objectName + " from " + *b)
 		http.Redirect(w, r, "/s3", http.StatusSeeOther)
 	}
 }
