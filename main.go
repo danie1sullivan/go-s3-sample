@@ -24,11 +24,11 @@ type S3PutObjectAPI interface {
 		optFns ...func(*s3.Options)) (*s3.PutObjectOutput, error)
 }
 
-//type S3DeleteObjectAPI interface {
-//	DeleteObject(ctx context.Context,
-//		params *s3.DeleteObjectInput,
-//		optFns ...func(*s3.Options)) (*s3.DeleteObjectOutput, error)
-//}
+type S3DeleteObjectAPI interface {
+	DeleteObject(ctx context.Context,
+		params *s3.DeleteObjectInput,
+		optFns ...func(*s3.Options)) (*s3.DeleteObjectOutput, error)
+}
 
 func GetObjects(c context.Context, api S3ListObjectsAPI, input *s3.ListObjectsV2Input) (*s3.ListObjectsV2Output, error) {
 	return api.ListObjectsV2(c, input)
@@ -38,9 +38,9 @@ func PutFile(c context.Context, api S3PutObjectAPI, input *s3.PutObjectInput) (*
 	return api.PutObject(c, input)
 }
 
-//func DeleteItem(c context.Context, api S3DeleteObjectAPI, input *s3.DeleteObjectInput) (*s3.DeleteObjectOutput, error) {
-//	return api.DeleteObject(c, input)
-//}
+func DeleteItem(c context.Context, api S3DeleteObjectAPI, input *s3.DeleteObjectInput) (*s3.DeleteObjectOutput, error) {
+	return api.DeleteObject(c, input)
+}
 
 func main() {
 	bucket := flag.String("b", "", "The name of the bucket")
@@ -54,7 +54,7 @@ func main() {
 	http.HandleFunc("/", handleHealth)
 	http.HandleFunc("/s3", handleS3(bucket))
 	http.HandleFunc("/s3/add", handleS3Add(bucket))
-	//http.HandleFunc("/s3/delete", handleS3Delete(bucket))
+	http.HandleFunc("/s3/delete", handleS3Delete(bucket))
 	http.HandleFunc("/health", handleHealth)
 	log.Fatal(http.ListenAndServe(":80", nil))
 }
@@ -62,6 +62,33 @@ func main() {
 func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
+}
+
+func handleS3Delete(b *string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cfg, err := config.LoadDefaultConfig(context.TODO())
+		if err != nil {
+			panic("configuration error, " + err.Error())
+		}
+
+		client := s3.NewFromConfig(cfg)
+
+		objectName := "Hello-World"
+		input := &s3.DeleteObjectInput{
+			Bucket: b,
+			Key:    &objectName,
+		}
+
+		_, err = DeleteItem(context.TODO(), client, input)
+		if err != nil {
+			fmt.Println("Got an error deleting item:")
+			fmt.Println(err)
+			return
+		}
+
+		fmt.Println("Deleted " + *objectName + " from " + *bucket)
+		http.Redirect(w, r, "/s3", http.StatusSeeOther)
+	}
 }
 
 func handleS3Add(b *string) http.HandlerFunc {
