@@ -31,7 +31,13 @@ func main() {
 	}
 
 	http.HandleFunc("/", handleHome(bucket))
+	http.HandleFunc("/health", handleHealth)
 	log.Fatal(http.ListenAndServe(":80", nil))
+}
+
+func handleHealth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }
 
 func handleHome(b *string) http.HandlerFunc {
