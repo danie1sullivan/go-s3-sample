@@ -137,20 +137,22 @@ func handleS3(b *string) http.HandlerFunc {
 			return
 		}
 
-		fmt.Fprintln(w, "Objects in "+*b+":")
+		fmt.Fprintln(w, "<html>")
+		fmt.Fprintln(w, "Objects in "+*b+":</ br>")
 
 		for _, item := range resp.Contents {
-			fmt.Fprintln(w, "Name:          ", *item.Key)
-			fmt.Fprintln(w, "Last modified: ", *item.LastModified)
-			fmt.Fprintln(w, "Size:          ", item.Size)
-			fmt.Fprintln(w, "Storage class: ", item.StorageClass)
+			fmt.Fprintln(w, "Name:          ", *item.Key, "</ br>")
+			fmt.Fprintln(w, "Last modified: ", *item.LastModified, "</ br>")
+			fmt.Fprintln(w, "Size:          ", item.Size, "</ br>")
+			fmt.Fprintln(w, "Storage class: ", item.StorageClass, "</ br>")
 			fmt.Fprintln(w, "")
 		}
 
-		fmt.Fprintln(w, "Found", len(resp.Contents), "items in bucket", *b)
-		fmt.Fprintln(w, "")
-		fmt.Fprintln(w, "<a href='/s3/add'>add</a>")
-		fmt.Fprintln(w, "<a href='/s3/delete'>delete</a>")
-		fmt.Fprintln(w, "")
+		fmt.Fprintln(w, "Found", len(resp.Contents), "items in bucket", *b, "</ br>")
+		fmt.Fprintln(w, "</ br>")
+		fmt.Fprintln(w, "<a href='/s3/add'>add</a></ br>")
+		fmt.Fprintln(w, "<a href='/s3/delete'>delete</a></ br>")
+		fmt.Fprintln(w, "</ br>")
+		fmt.Fprintln(w, "</html>")
 	}
 }
