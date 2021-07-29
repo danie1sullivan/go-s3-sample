@@ -149,5 +149,8 @@ func handleS3(b *string) http.HandlerFunc {
 
 		fmt.Fprintln(w, "Found", len(resp.Contents), "items in bucket", *b)
 		fmt.Fprintln(w, "")
+		fmt.Fprintln(w, "<a href='/s3/add'>add</a>")
+		fmt.Fprintln(w, "<a href='/s3/delete'>delete</a>")
+		fmt.Fprintln(w, "")
 	}
 }
