@@ -30,7 +30,8 @@ func main() {
 		return
 	}
 
-	http.HandleFunc("/", handleHome(bucket))
+	http.HandleFunc("/", handleHealth)
+	http.HandleFunc("/s3", handleHome(bucket))
 	http.HandleFunc("/health", handleHealth)
 	log.Fatal(http.ListenAndServe(":80", nil))
 }
@@ -60,7 +61,7 @@ func handleHome(b *string) http.HandlerFunc {
 			return
 		}
 
-		fmt.Println("Objects in " + *b + ":")
+		fmt.Fprintln(w, "Objects in "+*b+":")
 
 		for _, item := range resp.Contents {
 			fmt.Fprintln(w, "Name:          ", *item.Key)
